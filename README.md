@@ -1,9 +1,9 @@
 # OpenAI API Quickstart - Node.js example app
+
 Based on documentation for openai.
-German only chatbot.
+German only chatbot. %
 
 ![image](https://github.com/luiggidev/chatgtptest/assets/65421097/bfc8696e-8cb1-4f08-85b5-6a7cb762629b)
-
 
 ## Setup
 
@@ -25,14 +25,18 @@ German only chatbot.
 
 5. Make a copy of the example environment variables file
 
-   On Linux systems: 
+   On Linux systems:
+
    ```bash
    $ cp .env.example .env
    ```
+
    On Windows:
+
    ```powershell
    $ copy .env.example .env
    ```
+
 6. Add your [API key](https://platform.openai.com/account/api-keys) to the newly created `.env` file
 
 7. Run the app
