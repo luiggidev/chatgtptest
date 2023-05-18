@@ -1,5 +1,4 @@
 import { Configuration, OpenAIApi } from "openai";
-import { handleErrorResponse } from "./errorHandler";
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -22,7 +21,7 @@ const thatIsNotGerman = [
   "Tauche ein in den deutschen Sprachdschungel und lass uns gemeinsam auf Schatzsuche gehen!",
   "Es scheint, du hast ein Sprachrätsel für mich. Beantworte es auf Deutsch, damit wir weitermachen können!",
   "Willkommen in der deutschen Sprachakrobatik! Lass uns wortwörtlich Spaß haben!",
-  "Keine Sorge, ich beiße nicht! Aber ich antworte nur, wenn du Deutsch sprichst. Los geht's!"
+  "Keine Sorge, ich beiße nicht! Aber ich antworte nur, wenn du Deutsch sprichst. Los geht's!",
 ];
 
 export default async function handleRequest(req, res) {
@@ -50,7 +49,8 @@ export default async function handleRequest(req, res) {
 
     if (language !== "german") {
       // Randomly select a German phrase indicating the user hasn't written in German
-      responseText = thatIsNotGerman[Math.floor(Math.random() * thatIsNotGerman.length)];
+      responseText =
+        thatIsNotGerman[Math.floor(Math.random() * thatIsNotGerman.length)];
     }
 
     res.status(200).json({ result: responseText });
@@ -84,4 +84,14 @@ function validateRequest(req) {
 
     resolve();
   });
+}
+
+function handleErrorResponse(res, error) {
+  const statusCode = error.response ? error.response.status : 500;
+  const errorMessage = error.response
+    ? error.response.data
+    : "An error occurred during your request.";
+
+  console.error(`Error: ${error.message}`);
+  res.status(statusCode).json({ error: { message: errorMessage } });
 }
