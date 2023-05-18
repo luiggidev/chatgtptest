@@ -1,11 +1,12 @@
 import Head from "next/head";
 import { useState, useEffect } from "react";
+import React from "react";
 import styles from "./index.module.css";
 
 const initialMessage = {
   text: "Welcome to the chat! This bot only knows German, try to chat with him and discover secrets!",
   sender: "bot",
-  timestamp: new Date().toLocaleTimeString()
+  timestamp: new Date().toLocaleTimeString(),
 };
 
 export default function Home() {
@@ -13,34 +14,34 @@ export default function Home() {
     input: "",
     messages: [initialMessage],
     loading: false,
-    error: null
+    error: null,
   });
 
   useEffect(() => {
-    setChatState(prevState => ({
+    setChatState((prevState) => ({
       ...prevState,
-      showChatHistory: true
+      showChatHistory: true,
     }));
   }, []);
 
   async function onSubmit(event) {
     event.preventDefault();
-  
+
     const { input, messages } = chatState;
     if (input.trim() === "") {
-      setChatState(prevState => ({
+      setChatState((prevState) => ({
         ...prevState,
-        error: "Please enter a message." // Display an error message
+        error: "Please enter a message.", // Display an error message
       }));
       return;
     }
-  
-    setChatState(prevState => ({
+
+    setChatState((prevState) => ({
       ...prevState,
       loading: true,
-      error: null // Clear any previous error messages
+      error: null, // Clear any previous error messages
     }));
-  
+
     try {
       const response = await fetch("/api/generate", {
         method: "POST",
@@ -49,27 +50,29 @@ export default function Home() {
         },
         body: JSON.stringify({ userReply: input }),
       });
-  
+
       const data = await response.json();
       if (!response.ok) {
-        throw new Error(data.error || `Request failed with status ${response.status}`);
+        throw new Error(
+          data.error || `Request failed with status ${response.status}`
+        );
       }
-  
+
       addMessage(input, "user");
       addMessage(data.result, "bot");
-  
-      setChatState(prevState => ({
+
+      setChatState((prevState) => ({
         ...prevState,
         result: data.result,
         input: "",
-        loading: false
+        loading: false,
       }));
     } catch (error) {
       console.error(error);
-      setChatState(prevState => ({
+      setChatState((prevState) => ({
         ...prevState,
         loading: false,
-        error: "An error occurred. Please try again." // Display a generic error message
+        error: "An error occurred. Please try again.", // Display a generic error message
       }));
     }
   }
@@ -77,17 +80,17 @@ export default function Home() {
   function addMessage(text, sender) {
     const timestamp = new Date().toLocaleTimeString();
     const message = { text, sender, timestamp };
-    setChatState(prevState => ({
+    setChatState((prevState) => ({
       ...prevState,
-      messages: [...prevState.messages, message]
+      messages: [...prevState.messages, message],
     }));
   }
 
   function clearChat() {
-    setChatState(prevState => ({
+    setChatState((prevState) => ({
       ...prevState,
       input: "",
-      messages: [initialMessage]
+      messages: [initialMessage],
     }));
   }
 
@@ -110,7 +113,13 @@ export default function Home() {
               {/* Render the chat history */}
               {messages.map((message, index) => (
                 <div key={index} className={styles.message}>
-                  <span className={message.sender === "user" ? styles.userMessage : styles.botMessage}>
+                  <span
+                    className={
+                      message.sender === "user"
+                        ? styles.userMessage
+                        : styles.botMessage
+                    }
+                  >
                     {/* Display the sender and message */}
                     {message.sender === "user" ? "You" : "Bot"}: {message.text}
                   </span>
@@ -129,20 +138,33 @@ export default function Home() {
                 name="userReply"
                 placeholder="Enter a message"
                 value={input}
-                onChange={(e) => setChatState(prevState => ({ ...prevState, input:e.target.value }))}
+                onChange={(e) =>
+                  setChatState((prevState) => ({
+                    ...prevState,
+                    input: e.target.value,
+                  }))
+                }
                 className={styles.inputField}
                 required // Add the required attribute for HTML5 form validation
-                />
-                {error && (
+              />
+              {error && (
                 <span className={styles.error}>{error}</span> // Display the error message if present
+              )}
+              <button
+                type="submit"
+                className={styles.submitButton}
+                disabled={loading || input.trim() === ""}
+              >
+                {loading ? (
+                  <span className={styles.loadingIcon}>Loading...</span>
+                ) : (
+                  "Send"
                 )}
-                <button type="submit" className={styles.submitButton} disabled={loading || input.trim() === ""}>
-                {loading ? <span className={styles.loadingIcon}>Loading...</span> : "Send"}
-                </button>
-                </form>
-                </div>
-                )}
-                </main>
-                </div>
-                );
-                }
+              </button>
+            </form>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
