@@ -9,7 +9,6 @@ const thatIsNotGerman = [
   "Hoppla, da ist wohl jemand im Sprachlabyrinth verirrt! Bitte benutze Deutsch, damit ich dir helfen kann.",
   "Auf Deutsch sind die Antworten einfach magisch! Komm schon, lass uns in Deutsch zaubern!",
   "Spreche Deutsch, um das volle Potenzial meiner Antworten zu entfesseln!",
-  "Achtung! Du bist gerade außerhalb der deutschen Sprachzone gelandet. Bitte kehre zurück und sprich Deutsch.",
 ];
 
 export default async function handleRequest(req, res) {
