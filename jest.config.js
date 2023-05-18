@@ -5,4 +5,5 @@ module.exports = {
   testEnvironment: "jsdom",
   testEnvironment: "jest-environment-jsdom",
   setupFilesAfterEnv: ["./jest.setup.js"],
+  setupFiles: ["dotenv/config"],
 };

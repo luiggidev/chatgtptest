@@ -1,24 +1,25 @@
-import { Configuration, OpenAIApi } from "openai";
+// file name generate.js
+import { createOpenAIInstance } from "./openai";
+import { debugFlag } from "./config";
+import { detectLanguage } from "./detectLanguage";
 
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-const openai = new OpenAIApi(configuration);
-const debugFlag = true;
 const thatIsNotGerman = [
-  "Hoppla, da ist wohl jemand im Sprachlabyrinth verirrt! Bitte benutze Deutsch, damit ich dir helfen kann.",
-  "Auf Deutsch sind die Antworten einfach magisch! Komm schon, lass uns in Deutsch zaubern!",
-  "Spreche Deutsch, um das volle Potenzial meiner Antworten zu entfesseln!",
+  "Oops, looks like someone got lost in the language labyrinth! Please use German so that I can help you.",
+  "Answers are simply magical in German! Come on, let's do some German magic!",
+  "Attention! You have landed outside the German language zone. Please return and speak German.",
 ];
 
 export default async function handleRequest(req, res) {
   try {
-    await validateRequest(req);
+    const openai = createOpenAIInstance(process.env.OPENAI_API_KEY);
+    if (debugFlag === true) console.log(`handleRequest openai: ${openai}`);
+
+    await validateRequest(req, process.env.OPENAI_API_KEY);
 
     const userReply = req.body.userReply;
 
     // Determine the language of the user's reply
-    const language = await detectLanguage(userReply);
+    const language = await detectLanguage(userReply, openai);
 
     const userPrompt = `
       Rule: only answer back in German, be short in reply and try to keep the conversation going.
@@ -46,22 +47,12 @@ export default async function handleRequest(req, res) {
   }
 }
 
-async function detectLanguage(text) {
-  const completion = await openai.createCompletion({
-    model: "text-davinci-003",
-    prompt: `Which language is this, disconsider possible typos and that mostly the user is trying to reply in German (reply with the language info only): ${text}`,
-    temperature: 0.3,
-    max_tokens: 20, // Adjust the value based on your requirements
-  });
-  const language = completion.data.choices[0].text.trim().toLowerCase();
-  if (debugFlag == true) console.log(`Language detected: ${language}`);
-  return language;
-}
-
-function validateRequest(req) {
+async function validateRequest(req, key) {
   return new Promise((resolve, reject) => {
-    if (!configuration.apiKey) {
-      reject(new Error("OpenAI API key is not configured."));
+    if (!key) {
+      reject(
+        new Error("The OpenAI API key is missing or not configured correctly.")
+      );
     }
 
     const userReply = req.body.userReply;
